@@ -234,12 +234,12 @@ src/
 
 - **Type safety:** Always run `npm run codegen` after adding a new fragment. This keeps TypeScript types in sync with Contentful and prevents runtime errors.
 - **Adding blocks:** Follow this simple workflow when creating new blocks:
-  - Create the block in Contentful.
-  - Create its GraphQL fragment in `src/graphql/fragments/`.
-  - Export it from `fragments/index.ts`.
-  - Create the corresponding Astro component in `src/components/blocks/`.
-  - Add the block to the `BLOCKS` map in `BlockRenderer.astro`.
-  - Run `npm run codegen` to update TypeScript types.
+  1. Create the block in Contentful.
+  2. Create its GraphQL fragment in `src/graphql/fragments/`.
+  3. Export it from `fragments/index.ts`.
+  4. Create the corresponding Astro component in `src/components/blocks/`.
+  5. Add the block to the `BLOCKS` map in `BlockRenderer.astro`.
+  6. Run `npm run codegen` to update TypeScript types.
 - **Dynamic imports:** `BlockRenderer.astro` dynamically imports each block based on its `__typename`. No changes to `[...slug].astro` are needed when adding new blocks.
 - **Centralized fragments:** Always import fragments from `fragments/index.ts` to keep a single source of truth and simplify queries.
 - **Marketing-friendly:** Editors can add, remove, or rearrange blocks in Contentful without touching code. Your page updates automatically.
