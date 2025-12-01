@@ -165,7 +165,19 @@ fragment ImageWithContentFields on ImageWithContent {
 export { ImageWithContentFields } from './ImageWithContent';
 ```
 
-### Step 3: Add to Page Query
+### Step 3: Run Codegen After Adding a Fragment
+
+**Important:** After creating your new fragment and exporting it in `fragments/index.ts`, run:
+
+```bash
+npm run codegen
+```
+
+- This regenerates `src/generated/graphql.ts`
+- Provides type safety for your new block
+- Ensures IDE autocomplete works for the block’s fields
+
+### Step 4: Add to Page Query
 
 Once your fragment is created, you need to include it in the main page query so Contentful knows to fetch it.
 
@@ -206,7 +218,7 @@ export const getPageBySlugQuery = `
 `;
 ```
 
-### Step 4: Astro Component
+### Step 5: Astro Component
 
 - Create `src/components/blocks/ImageWithContent.astro`:
 
@@ -232,7 +244,7 @@ const renderedDescription = documentToHtmlString(description?.json);
 
 ```
 
-### Step 5: Update `BlockRenderer.astro`
+### Step 6: Update `BlockRenderer.astro`
 
 ```ts
 const BLOCKS: Record<string, string> = {
@@ -245,7 +257,7 @@ const BLOCKS: Record<string, string> = {
 
 - No other changes are needed — dynamic import handles the rest
 
-### Step 6: Add Block in Contentful
+### Step 7: Add Block in Contentful
 
 - In a Page entry, add the new block in the `builder` field
 - Fill fields and publish
