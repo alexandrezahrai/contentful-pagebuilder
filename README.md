@@ -232,7 +232,7 @@ src/
 
 ## Tips & Best Practices
 
-- **Type safety:** Always `run npm run codegen` after adding a new fragment. This keeps TypeScript types in sync with Contentful and prevents runtime errors.
+- **Type safety:** Always run `npm run codegen` after adding a new fragment. This keeps TypeScript types in sync with Contentful and prevents runtime errors.
 - **Adding blocks:** Follow this simple workflow when creating new blocks:
   - Create the block in Contentful.
   - Create its GraphQL fragment in `src/graphql/fragments/`.
