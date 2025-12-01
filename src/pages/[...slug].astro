@@ -3,7 +3,7 @@ import type { PageBySlugQuery, PageBySlugQueryVariables } from '@/generated/grap
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import { fetchContentful } from '../lib/contentful.ts';
-import { getPageBySlugQuery } from '../graphql/getPageBySlug.ts'; // ✅ named import
+import { getPageBySlugQuery } from '../graphql/getPageBySlug.ts';
 
 // --------------------------
 // Step 1: Static Paths
@@ -33,7 +33,6 @@ export async function getStaticPaths() {
 // --------------------------
 const slugParam = (Astro.params as { slug?: string }).slug ?? 'home';
 
-// fetchContentful with generics from Codegen
 const data = await fetchContentful<PageBySlugQuery, PageBySlugQueryVariables>(getPageBySlugQuery, {
   slug: slugParam,
 });
@@ -43,8 +42,10 @@ const page = data.pageCollection?.items?.[0];
 if (!page) {
   throw new Error('Page not found');
 }
+
+const blocks = page.builderCollection?.items?.filter(Boolean) ?? [];
 ---
 
 <Layout title={page.title ?? 'Untitled'} description={page.title ?? 'Untitled'}>
-  {page.builderCollection?.items?.map((block) => <BlockRenderer block={block} />)}
+  {blocks.map((block) => <BlockRenderer block={block} />)}
 </Layout>

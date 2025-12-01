@@ -1,26 +1,39 @@
 ---
-import type { HeroSectionFragment, CallToActionSectionFragment } from '@/generated/graphql';
+import type { PageBySlugQuery } from '@/generated/graphql';
 
-type PageBlock = HeroSectionFragment | CallToActionSectionFragment;
+type PageBlock =
+  NonNullable<
+  // @ts-ignore
+    NonNullable<PageBySlugQuery['pageCollection']>['items'][0]['builderCollection']
+  >['items'][0];
 
-const { block } = Astro.props as { block: PageBlock };
+const { block } = Astro.props as { block?: PageBlock };
 
 const BLOCKS: Record<string, string> = {
   HeroSection: './blocks/HeroSection.astro',
   CallToActionSection: './blocks/CallToActionSection.astro',
-  // Add new blocks here
+  ImageWithContent: './blocks/ImageWithContent.astro',
+  // add more blocks here
 };
 
 let Component: any = null;
-const componentPath = BLOCKS[block.__typename];
 
-if (componentPath) {
-  const modules = import.meta.glob('./blocks/*.astro');
-  const mod = await modules[componentPath]();
-  Component = (mod as { default: any }).default;
-} else {
-  console.warn(`Unknown block type: ${block.__typename}`);
+if (block?.__typename) {
+  const componentPath = BLOCKS[block.__typename];
+
+  if (componentPath) {
+    const modules = import.meta.glob('./blocks/*.astro');
+
+    try {
+      const mod = await modules[componentPath]();
+      Component = (mod as { default: any }).default;
+    } catch (err) {
+      console.error(`BlockRenderer: Failed to load component "${componentPath}"`, err);
+    }
+  } else {
+    console.warn(`BlockRenderer: No Astro component mapped for typename "${block.__typename}"`);
+  }
 }
 ---
 
-{Component ? <Component {...block} /> : null}
+{Component ? <Component {...block} /> : <></>}
