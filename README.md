@@ -13,16 +13,27 @@ Built with:
 
 ---
 
+## Marketing User Quick Start
+
+1. Log in to Contentful and select your space.
+2. Create a new `Page` entry or edit an existing one.
+3. Fill in the `title` and `slug`.
+4. Add blocks using the `builder` reference field.
+5. Fill out the fields for each block.
+6. Rearrange blocks as desired.
+7. Publish the page. No developer involvement needed.
+
 ## Table of Contents
 
 1. [Project Setup](#project-setup)
 2. [Environment Variables](#environment-variables)
 3. [Install Dependencies](#install-dependencies)
 4. [Running the Project](#running-the-project)
-5. [GraphQL Types (Codegen)](#graphql-types-codegen)
-6. [Creating New Blocks](#creating-new-blocks)
-7. [Folder Structure](#folder-structure)
-8. [Tips & Best Practices](#tips--best-practices)
+5. [Contentful Setup](#contentful-setup)
+6. [GraphQL Types (Codegen)](#graphql-types-codegen)
+7. [Creating New Blocks](#creating-new-blocks)
+8. [Folder Structure](#folder-structure)
+9. [Tips & Best Practices](#tips--best-practices)
 
 ---
 
@@ -62,6 +73,35 @@ npm run dev
 - Starts Astro dev server
 - Open your browser at http://localhost:4321/
 
+## Contentful Setup
+
+Before you can render pages in Astro, you need to set up the Contentful space with the proper content types and fields. This section ensures the CMS structure matches your page builder.
+
+### Create the Page Content Type
+
+- In Contentful, create a new `Content Type` called `Page`.
+- Add the following fields:
+  - `title` — Short text
+  - `slug` — Short text (used in the URL)
+  - `builder` — Reference field (allows multiple entries, references block content types)
+
+**Note:** The `builder` field is the core of the page builder. Marketing users will use it to stack and reorder blocks.
+
+### Marketing Workflow
+
+Once content types exist:
+
+- Editors create new `Page` entries.
+- Fill the `title` and `slug` fields.
+- Use the `builder` field to add, stack, and reorder blocks.
+- Fill in block-specific fields.
+- Publish the page.
+
+**Notes:**
+
+- No code changes are needed for new pages. As long as the block exists in Contentful and the Astro component is implemented, the page renders automatically.
+- Marketing users can reorder blocks in the builder field, and the page in Astro will update automatically without code changes.
+
 ## GraphQL Types (Codegen)
 
 1. Install Codegen packages (already included in this project):
@@ -83,13 +123,23 @@ npm run codegen
 
 Follow this workflow to add a new reusable block (e.g., `ImageWithContent`):
 
-### 1. Contentful Content Type
+### Step 1: Contentful Content Type
 
 - Create a new **Content Type** for the block (e.g., `ImageWithContent`).
 - Add only the fields the block needs (e.g., `title`, `description`, `image`).
 - Publish it.
 
-### 2. GraphQL Fragment
+Example:
+
+**Image with Content**
+
+- `title` — Short text
+- `description` — Rich text
+- `image` — Media
+
+**Note:** Keep each block focused and modular. Each block should map directly to a single Astro component.
+
+### Step 2: GraphQL Fragment
 
 - Create `src/graphql/fragments/ImageWithContent.ts`:
 
@@ -115,7 +165,7 @@ fragment ImageWithContentFields on ImageWithContent {
 export { ImageWithContentFields } from './ImageWithContent';
 ```
 
-### 3. Add to Page Query
+### Step 3: Add to Page Query
 
 Once your fragment is created, you need to include it in the main page query so Contentful knows to fetch it.
 
@@ -156,7 +206,7 @@ export const getPageBySlugQuery = `
 `;
 ```
 
-### 4. Astro Component
+### Step 4: Astro Component
 
 - Create `src/components/blocks/ImageWithContent.astro`:
 
@@ -182,7 +232,7 @@ const renderedDescription = documentToHtmlString(description?.json);
 
 ```
 
-### 5. Update `BlockRenderer.astro`
+### Step 5: Update `BlockRenderer.astro`
 
 ```ts
 const BLOCKS: Record<string, string> = {
@@ -195,7 +245,7 @@ const BLOCKS: Record<string, string> = {
 
 - No other changes are needed — dynamic import handles the rest
 
-### 6. Add Block in Contentful
+### Step 6: Add Block in Contentful
 
 - In a Page entry, add the new block in the `builder` field
 - Fill fields and publish
@@ -232,7 +282,7 @@ src/
 
 ## Tips & Best Practices
 
-- **Type safety:** Always run `npm run codegen` after adding a new fragment. This keeps TypeScript types in sync with Contentful and prevents runtime errors.
+- **Type safety:** Always run `npm run codegen` after adding a new fragment. This keeps TypeScript types in sync with Contentful and prevents runtime errors. Adding a new Astro component for an existing block type does not require codegen.
 - **Adding blocks:** Follow this simple workflow when creating new blocks:
   1. Create the block in Contentful.
   2. Create its GraphQL fragment in `src/graphql/fragments/`.
