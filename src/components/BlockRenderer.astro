@@ -1,0 +1,26 @@
+---
+import type { HeroSectionFragment, CallToActionSectionFragment } from '@/generated/graphql';
+
+type PageBlock = HeroSectionFragment | CallToActionSectionFragment;
+
+const { block } = Astro.props as { block: PageBlock };
+
+const BLOCKS: Record<string, string> = {
+  HeroSection: './blocks/HeroSection.astro',
+  CallToActionSection: './blocks/CallToActionSection.astro',
+  // Add new blocks here
+};
+
+let Component: any = null;
+const componentPath = BLOCKS[block.__typename];
+
+if (componentPath) {
+  const modules = import.meta.glob('./blocks/*.astro');
+  const mod = await modules[componentPath]();
+  Component = (mod as { default: any }).default;
+} else {
+  console.warn(`Unknown block type: ${block.__typename}`);
+}
+---
+
+{Component ? <Component {...block} /> : null}

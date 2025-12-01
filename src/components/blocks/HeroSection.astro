@@ -1,0 +1,19 @@
+---
+import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
+
+interface Props {
+  title: string;
+  description: any;
+  image: any;
+  className?: string;
+}
+
+const { title, description, image, className = "" }: Props = Astro.props;
+const renderedDescription = documentToHtmlString(description?.json);
+---
+
+<section class={`hero-section ${className}`}>
+  <img src={image?.url} alt={image?.description} />
+  <h1>{title}</h1>
+  <article set:html={renderedDescription} />
+</section>

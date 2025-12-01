@@ -1,0 +1,50 @@
+---
+import type { PageBySlugQuery, PageBySlugQueryVariables } from '@/generated/graphql';
+import Layout from '../layouts/Layout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { fetchContentful } from '../lib/contentful.ts';
+import { getPageBySlugQuery } from '../graphql/getPageBySlug.ts'; // ✅ named import
+
+// --------------------------
+// Step 1: Static Paths
+// --------------------------
+export async function getStaticPaths() {
+  const data = await fetchContentful<{ pageCollection: { items: { slug: string }[] } }>(`
+    query AllPages {
+      pageCollection {
+        items {
+          slug
+        }
+      }
+    }
+  `);
+
+  if (!data?.pageCollection?.items) return [];
+
+  return data.pageCollection.items.map((page) => ({
+    params: {
+      slug: page.slug === 'home' ? undefined : page.slug,
+    },
+  }));
+}
+
+// --------------------------
+// Step 2: Fetch page by slug
+// --------------------------
+const slugParam = (Astro.params as { slug?: string }).slug ?? 'home';
+
+// fetchContentful with generics from Codegen
+const data = await fetchContentful<PageBySlugQuery, PageBySlugQueryVariables>(getPageBySlugQuery, {
+  slug: slugParam,
+});
+
+const page = data.pageCollection?.items?.[0];
+
+if (!page) {
+  throw new Error('Page not found');
+}
+---
+
+<Layout title={page.title ?? 'Untitled'} description={page.title ?? 'Untitled'}>
+  {page.builderCollection?.items?.map((block) => <BlockRenderer block={block} />)}
+</Layout>
